@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>T计划引力测绘仪｜TTC</title>
+  <style>
+    :root {
+      --bg: #020807; 
+      --text: #f4fffb;
+      --muted: rgba(244,255,251,.5);
+      --soft: rgba(244,255,251,.38);
+      --mint: #8fe8dc;
+      --mint-strong: #c8fff4;
+      --green: #2b9f8f;
+      --cyan: #67d6cc;
+      --orange: #d6a45a;
+      --line: rgba(143,232,220,.06);
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      background: var(--bg); 
+      color: var(--text); 
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    /* ===================================================
+       🎬 电影级深空背景系统
+       =================================================== */
+    body {
+      position: relative;
+      background-color: var(--bg);
+    }
+
+    /* 1. 电影暗角与拉伸星云光晕 */
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        /* 中央变形荧幕状星云 */
+        radial-gradient(ellipse 60% 40% at 50% 50%, rgba(143,232,220,.05) 0%, transparent 70%),
+        radial-gradient(circle at 80% 20%, rgba(214,164,90,.018), transparent 40%),
+        /* 电影级四周暗角压制 */
+        radial-gradient(circle at 50% 50%, transparent 30%, rgba(2, 8, 7, 0.86) 100%);
+      pointer-events: none;
+      animation: nebula-breathe 18s ease-in-out infinite alternate;
+    }
+
+    /* 2. 远景：慢速漂移的微米级星尘 */
+    .space-dust {
+      position: absolute;
+      width: 200%; height: 200%;
+      top: -50%; left: -50%;
+      z-index: 2;
+      /* 纯CSS生成的随机微小星尘群 */
+      background-image: 
+        radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 2px),
+        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 1.5px),
+        radial-gradient(rgba(143,232,220,.3), transparent 1.5px, transparent 2.5px);
+      background-size: 350px 350px, 200px 200px, 280px 280px;
+      background-position: 0 0, 40px 60px, 130px 270px;
+      opacity: 0.25;
+      animation: space-drift 120s linear infinite;
+      pointer-events: none;
+    }
+
+    /* 3. 胶片噪点层：打破数码平滑，注入胶片呼吸感 */
+    .film-grain {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      opacity: 0.022; 
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* 顶栏 */
+    .header {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 72px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; z-index: 100;
+      border-bottom: 1px solid rgba(143,232,220,.06);
+      background: rgba(2, 8, 7, 0.68);
+      backdrop-filter: blur(20px);
+    }
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .official-logo { height: 42px; width: auto; opacity: .98; }
+    .brand-divider { width: 1px; height: 32px; background: rgba(244,255,251,.18); }
+    .t-plan-wordmark {
+      display: grid;
+      gap: 6px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .t-plan-wordmark b {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0;
+      font-family: var(--font-sans);
+    }
+    .t-plan-wordmark span {
+      color: rgba(244,255,251,.58);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      font-family: var(--font-mono);
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+    .status { color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .status::before { content: ""; width: 5px; height: 5px; background: var(--mint); border-radius: 50%; box-shadow: 0 0 8px var(--mint); }
+    .back-home {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border: 1px solid rgba(143,232,220,.12);
+      border-radius: 8px;
+      color: rgba(244,255,251,.78);
+      text-decoration: none;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 760;
+      letter-spacing: 0;
+      background: rgba(255,255,255,.035);
+      transition: color .22s, border-color .22s, background .22s, transform .22s;
+    }
+    .back-home:hover {
+      color: #fff;
+      border-color: rgba(143,232,220,.3);
+      background: rgba(143,232,220,.06);
+      transform: translateY(-1px);
+    }
+
+    /* 主舞台 */
+    .universe-stage {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    /* ===================================================
+       🌌 全息无背景光束粒子弹幕系统
+       =================================================== */
+    .ai-barrage-container {
+      position: absolute;
+      top: 105px; /* 紧贴顶栏下方 */
+      left: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 3; 
+      pointer-events: none; 
+      opacity: 0.34;
+      transition: opacity 0.6s ease;
+      mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+    }
+
+    .universe-stage:hover .ai-barrage-container {
+      opacity: 0.5; 
+    }
+
+    .barrage-track {
+      display: flex;
+      width: max-content;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .barrage-group {
+      display: flex;
+      align-items: center;
+      gap: 90px;
+      padding-right: 90px;
+    }
+
+    .barrage-group span {
+      font-family: var(--font-sans);
+      font-size: 16px; 
+      font-weight: 600;
+      letter-spacing: 2px;
+      background: none; 
+      border: none; 
+      box-shadow: none; 
+      padding: 0;
+    }
+
+    .track-to-left span {
+      color: rgba(143, 232, 220, 0.85); 
+      text-shadow: 0 0 10px rgba(143, 232, 220, 0.45);
+    }
+
+    .track-to-right span {
+      color: rgba(229, 181, 105, 0.8); 
+      text-shadow: 0 0 10px rgba(229, 181, 105, 0.4);
+    }
+
+    .track-to-left .barrage-group {
+      animation: scroll-left 56s linear infinite;
+    }
+    .track-to-right .barrage-group {
+      animation: scroll-right 64s linear infinite;
+    }
+
+    @keyframes scroll-left {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    @keyframes scroll-right {
+      0% { transform: translate3d(-100%, 0, 0); }
+      100% { transform: translate3d(0, 0, 0); }
+    }
+
+
+    /* ===================================================
+       🛰️ 统一等距下移 40px (~1cm) 保持完美几何中心
+       =================================================== */
+    
+    /* 雷达虚线圈 */
+    .radar-line {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      margin-top: 40px; /* 同步下移 */
+      border: 1px dashed var(--line);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .radar-line::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: conic-gradient(from 0deg, transparent 0 68%, rgba(143,232,220,.18), transparent 82% 100%);
+      mask: radial-gradient(circle, transparent calc(50% - 1px), black calc(50% - 1px), black calc(50% + 1px), transparent calc(50% + 1px));
+      opacity: .55;
+    }
+    .rd-1 { width: 440px; height: 440px; animation: radar-spin 34s linear infinite; }
+    .rd-2 { width: 850px; height: 850px; animation: radar-spin 58s linear infinite reverse; }
+
+    /* 中心控制投影区 */
+    .center-singularity {
+      width: 460px;
+      height: 460px;
+      position: relative;
+      margin-top: 40px; /* 同步下移 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      animation: singularity-drift 9s ease-in-out infinite alternate;
+    }
+    .center-singularity::before {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(143,232,220,.075), transparent 42%),
+        radial-gradient(circle, transparent 47%, rgba(143,232,220,.04) 48%, transparent 50%);
+      filter: blur(.2px);
+      animation: lens-pulse 5.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .display-panel {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      padding: 0 24px;
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 初始界面 */
+    .panel-default {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+    .panel-default h2 { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.4; margin-bottom: 24px; text-shadow: 0 4px 20px rgba(0,0,0,0.6); animation: title-float 6s ease-in-out infinite alternate; }
+    .panel-default h2 span { color: var(--mint); }
+    
+    .btn-action {
+      display: inline-flex; background: transparent; color: var(--mint); border: 1px solid rgba(143,232,220,0.2);
+      padding: 12px 28px; border-radius: 4px; font-size: 13px; font-weight: 700; text-decoration: none; 
+      letter-spacing: 1px; font-family: var(--font-mono); transition: all 0.3s;
+      backdrop-filter: blur(4px); 
+    }
+    .btn-action:hover { background: var(--mint); color: #020504; box-shadow: 0 0 30px rgba(143,232,220,0.35); border-color: var(--mint); }
+
+    /* 信号解密面板排版 */
+    .panel-decrypt {
+      width: 116%;
+      padding: 22px 28px 24px;
+      border: 1px solid rgba(143,232,220,.1);
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(143,232,220,.055), transparent 52%),
+        rgba(2,8,7,.76);
+      box-shadow: 0 22px 54px rgba(0,0,0,.36), inset 0 1px 0 rgba(244,255,251,.035);
+      backdrop-filter: blur(18px);
+      font-family: var(--font-mono);
+      text-align: left;
+    }
+    .panel-decrypt .head-code { font-size: 11px; letter-spacing: 2px; margin-bottom: 24px; display: block; font-weight: 700; }
+    
+    .data-row { margin-bottom: 24px; position: relative; padding-left: 16px; }
+    .data-row:last-child { margin-bottom: 0; }
+    .data-row::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 1px; }
+    
+    .data-row b { display: block; font-size: 18px; color: #fff; margin-bottom: 6px; font-weight: 800; font-family: var(--font-sans); letter-spacing: -0.2px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .data-row p { font-size: 13px; color: var(--muted); line-height: 1.5; font-family: var(--font-sans); }
+
+    /* WHY 特调高亮：薄荷绿 */
+    .panel-why .head-code { color: var(--mint); text-shadow: 0 0 10px rgba(143,232,220,0.2); }
+    .panel-why .data-row::before { background: var(--mint); }
+    .panel-why .data-row b { color: var(--mint); } 
+
+    /* WHO 特调高亮：电光橙 */
+    .panel-who .head-code { color: var(--orange); text-shadow: 0 0 10px rgba(214,164,90,0.2); }
+    .panel-who .data-row::before { background: var(--orange); }
+    .panel-who .data-row b { color: var(--orange); }
+
+
+    /* 两侧悬浮粒子星体 */
+    .celestial-star {
+      position: absolute;
+      top: 50%; left: 50%;
+      margin-top: 40px; /* 同步下移 */
+      z-index: 30;
+    }
+
+    .star-core {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      transform: translate(-50%, -50%);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .star-core::after {
+      content: "";
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, currentColor 0 2px, transparent 3px);
+      opacity: .12;
+      transform: scale(.8);
+      animation: signal-ripple 3.6s ease-out infinite;
+    }
+    
+    .star-core::before {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 90px; height: 90px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid transparent;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .star-core .tag {
+      position: absolute;
+      top: 26px; left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--muted);
+      white-space: nowrap;
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+
+    /* --- 左侧：01_WHY_缘起 --- */
+    .star-01 { margin-left: -330px; }
+    .star-01 .star-core { color: var(--mint); background: var(--mint); box-shadow: 0 0 20px var(--mint); animation: orbit-left 10s ease-in-out infinite alternate; }
+    .star-01 .star-core::before { border-color: rgba(143,232,220,0.06); background: radial-gradient(circle, rgba(143,232,220,0.05) 0%, transparent 70%); }
+    
+    .star-01:hover .star-core { transform: translate(-50%, -50%) scale(1.35); box-shadow: 0 0 35px var(--mint); }
+    .star-01:hover .star-core::before { border-color: rgba(143,232,220,0.22); width: 110px; height: 110px; }
+    .star-01:hover .star-core .tag { color: var(--mint); text-shadow: 0 0 8px rgba(143,232,220,0.5); }
+
+    /* --- 右侧：02_WHO_同类 --- */
+    .star-02 { margin-left: 330px; }
+    .star-02 .star-core { color: var(--orange); background: var(--orange); box-shadow: 0 0 20px var(--orange); animation: orbit-right 11s ease-in-out infinite -2.5s alternate; }
+    .star-02 .star-core::before { border-color: rgba(214,164,90,0.05); background: radial-gradient(circle, rgba(214,164,90,0.04) 0%, transparent 70%); }
+
+    .star-02:hover .star-core { transform: translate(-50%, -50%) scale(1.35); box-shadow: 0 0 35px var(--orange); }
+    .star-02:hover .star-core::before { border-color: rgba(214,164,90,0.18); width: 110px; height: 110px; }
+    .star-02:hover .star-core .tag { color: var(--orange); text-shadow: 0 0 8px rgba(214,164,90,0.5); }
+
+
+    /* ===================================================
+       📌 引力场捕获联动核心
+       =================================================== */
+    .universe-stage:has(.star-01:hover) .panel-default { opacity: 0; transform: scale(0.96); pointer-events: none; }
+    .universe-stage:has(.star-01:hover) .panel-why { opacity: 1; transform: scale(1); pointer-events: auto; }
+    .universe-stage:has(.star-01:hover) .ai-barrage-container { opacity: .18; }
+
+    .universe-stage:has(.star-02:hover) .panel-default { opacity: 0; transform: scale(0.96); pointer-events: none; }
+    .universe-stage:has(.star-02:hover) .panel-who { opacity: 1; transform: scale(1); pointer-events: auto; }
+    .universe-stage:has(.star-02:hover) .ai-barrage-container { opacity: .18; }
+
+
+    /* 宇宙深空尘漂移 */
+    @keyframes space-drift {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(-5% , -5%) rotate(3deg); }
+    }
+    @keyframes nebula-breathe {
+      0% { opacity: .72; transform: scale(1); filter: saturate(.9); }
+      100% { opacity: 1; transform: scale(1.035); filter: saturate(1.18); }
+    }
+    @keyframes grain-flicker {
+      0%, 100% { transform: translate(0, 0); opacity: .028; }
+      25% { transform: translate(-1%, .5%); opacity: .04; }
+      50% { transform: translate(.8%, -1%); opacity: .032; }
+      75% { transform: translate(.4%, .8%); opacity: .044; }
+    }
+    @keyframes radar-spin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    @keyframes singularity-drift {
+      0% { transform: translate3d(-5px, 4px, 0); }
+      100% { transform: translate3d(5px, -6px, 0); }
+    }
+    @keyframes lens-pulse {
+      0%, 100% { opacity: .38; transform: scale(.94); }
+      50% { opacity: .76; transform: scale(1.04); }
+    }
+    @keyframes title-float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-7px); }
+    }
+    @keyframes orbit-left {
+      0% { transform: translate(-50%, -50%) translate3d(-6px, 10px, 0); }
+      45% { transform: translate(-50%, -50%) translate3d(8px, -12px, 0); }
+      100% { transform: translate(-50%, -50%) translate3d(-2px, -18px, 0); }
+    }
+    @keyframes orbit-right {
+      0% { transform: translate(-50%, -50%) translate3d(8px, -8px, 0); }
+      50% { transform: translate(-50%, -50%) translate3d(-7px, 12px, 0); }
+      100% { transform: translate(-50%, -50%) translate3d(4px, 18px, 0); }
+    }
+    @keyframes signal-ripple {
+      0% { opacity: .18; transform: scale(.5); }
+      75%, 100% { opacity: 0; transform: scale(1.7); }
+    }
+
+    /* 移动端智能响应还原 */
+    @media (max-width: 800px) {
+      body, html { overflow-y: auto; height: auto; }
+      .space-dust, .film-grain { display: none; }
+      .header { position: static; height: auto; padding: 18px 20px; }
+      .official-logo { height: 34px; }
+      .brand-lockup { gap: 10px; }
+      .brand-divider { height: 28px; }
+      .t-plan-wordmark { gap: 5px; }
+      .t-plan-wordmark b { font-size: 14px; }
+      .t-plan-wordmark span { font-size: 7px; letter-spacing: .1em; }
+      .header-right { gap: 10px; }
+      .status { display: none; }
+      .back-home { min-height: 38px; padding: 0 12px; font-size: 12px; }
+      .universe-stage { height: auto; padding: 20px; flex-direction: column; gap: 40px; }
+      .radar-line { display: none; }
+      .center-singularity { width: 100%; height: auto; position: static; margin-top: 0 !important; }
+      .panel-default { position: static; opacity: 1; transform: none; pointer-events: auto; margin-bottom: 40px; }
+      .celestial-star { position: static; margin: 0 !important; width: 100%; }
+      .star-core { width: 100%; height: auto; transform: none !important; animation: none !important; background: transparent !important; box-shadow: none !important; }
+      .star-core::before { display: none; }
+      .star-core .tag { position: static; transform: none; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 12px; display: block; }
+      .panel-decrypt { position: static; opacity: 1; transform: none; pointer-events: auto; background: rgba(255,255,255,0.01); border-left: 2px solid var(--mint); padding: 20px; border-radius: 2px; margin-bottom: 20px; }
+      .panel-who { border-left-color: var(--orange); }
+      
+      .ai-barrage-container {
+        position: relative;
+        top: auto;
+        margin-top: 20px;
+        mask-image: none;
+        -webkit-mask-image: none;
+        opacity: 0.85;
+      }
+      .barrage-group { gap: 40px; padding-right: 40px; }
+      .barrage-group span { font-size: 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 48%, rgba(143,232,220,.06), rgba(2,8,7,.2) 42%, rgba(2,8,7,.86) 100%);
+      opacity: 0;
+    }
+    body.is-entering .header,
+    body.is-entering .universe-stage {
+      animation: page-zoom-in .88s cubic-bezier(.22,1,.36,1) both;
+      transform-origin: 50% 48%;
+    }
+    body.is-leaving .header,
+    body.is-leaving .universe-stage {
+      animation: page-zoom-out .66s cubic-bezier(.22,1,.36,1) both;
+      transform-origin: 50% 48%;
+    }
+    body.is-entering .page-transition {
+      animation: transition-veil-in .88s cubic-bezier(.22,1,.36,1) both;
+    }
+    body.is-leaving .page-transition {
+      animation: transition-veil-out .66s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes page-zoom-in {
+      0% { opacity: .28; transform: scale(1.035); filter: saturate(.9); }
+      100% { opacity: 1; transform: scale(1); filter: saturate(1); }
+    }
+    @keyframes page-zoom-out {
+      0% { opacity: 1; transform: scale(1); filter: saturate(1); }
+      100% { opacity: .18; transform: scale(.955); filter: saturate(.82); }
+    }
+    @keyframes transition-veil-in {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes transition-veil-out {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-transition" aria-hidden="true"></div>
+  <div class="space-dust"></div>
+  <div class="film-grain"></div>
+
+  <header class="header">
+    <a class="brand-lockup" href="./index.html" aria-label="返回 TTC T计划首页">
+      <img class="official-logo" src="./ttc-true-talents-connect-logo.png" alt="True Talents Connect" width="293" height="93">
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span class="t-plan-wordmark" aria-label="TTC T计划 AI Native Talent Matching">
+        <b>TTC T计划</b>
+        <span>AI NATIVE TALENT MATCHING</span>
+      </span>
+    </a>
+    <div class="header-right">
+      <div class="status">RADAR_SYS_ACTIVE</div>
+      <a class="back-home" href="./index.html">返回首页</a>
+    </div>
+  </header>
+
+  <main class="universe-stage">
+
+    <!-- 全息粒子弹幕层 -->
+    <div class="ai-barrage-container">
+      <div class="barrage-track track-to-left">
+        <div class="barrage-group">
+          <span>如果你是这种 —— 拒绝把满腔自驱力，消耗在机械打电话、筛简历的传统猎头流水线上</span>
+          <span>如果你是这种 —— 拥有蓬勃的野心，渴望跟顶尖科技创始人和科学家直接对话，重塑人才流向</span>
+          <span>如果你是这种 —— 对科技行业的人才匹配、智能链接工作，天然拥有着难以抑制的成长兴趣</span>
+        </div>
+        <div class="barrage-group" aria-hidden="true">
+          <span>如果你是这种 —— 拒绝把满腔自驱力，消耗在机械打电话、筛简历的传统猎头流水线上</span>
+          <span>如果你是这种 —— 拥有蓬勃的野心，渴望跟顶尖科技创始人和科学家直接对话，重塑人才流向</span>
+          <span>如果你是这种 —— 对科技行业的人才匹配、智能链接工作，天然拥有着难以抑制的成长兴趣</span>
+        </div>
+      </div>
+
+      <div class="barrage-track track-to-right">
+        <div class="barrage-group">
+          <span>如果你是这种 —— 毕业于国内 985 / 211 院校或 QS 世界前 100，期待用硬核实力证明自己</span>
+          <span>如果你是这种 —— 身为 00 后前沿极客，对 AI 生成工具与工作流自动化，有着偏执般的探索欲望</span>
+          <span>如果你是这种 —— 不甘只当一颗社会螺丝钉，而是想成为下一代 AI 智能链接工具的深度产品共创官</span>
+        </div>
+        <div class="barrage-group" aria-hidden="true">
+          <span>如果你是这种 —— 毕业于国内 985 / 211 院校或 QS 世界前 100，期待用硬核实力证明自己</span>
+          <span>如果你是这种 —— 身为 00 后前沿极客，对 AI 生成工具与工作流自动化，有着偏执般的探索欲望</span>
+          <span>如果你是这种 —— 不甘只当一颗社会螺丝钉，而是想成为下一代 AI 智能链接工具的深度产品共创官</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="radar-line rd-1"></div>
+    <div class="radar-line rd-2"></div>
+
+    <section class="center-singularity">
+      
+      <div class="display-panel panel-default">
+        <h2>解构 AI 前线产业现场<br>探索 <span>T 计划星球</span></h2>
+        <a class="btn-action" href="./index.html#stories">> 查看加入T计划后的收获</a>
+      </div>
+
+      <div class="display-panel panel-decrypt panel-why">
+        <span class="head-code">// SIGNAL_DECRYPTED: 01_WHY_缘起</span>
+        <div class="data-row">
+          <b>1. 打破传统工业化流水线的“内卷”</b>
+          <p>拒绝把年轻人的自驱力消耗在机械打卡、毫无成长性的传统灌水模式里。</p>
+        </div>
+        <div class="data-row">
+          <b>2. 站在大模型与芯片的“产业最前线”</b>
+          <p>每天直接对话行业最顶尖的创始人和科学家，在真实的商业试验场沉淀含金量最高的专业视野。</p>
+        </div>
+        <div class="data-row">
+          <b>3. 用自研 AI 工作流重塑人才流向</b>
+          <p>不仅是顾问，更是下一代 AI 智能连接工具的深度产品共创官，用技术反哺科技商业节点。</p>
+        </div>
+      </div>
+
+      <div class="display-panel panel-decrypt panel-who">
+        <span class="head-code">// SIGNAL_DECRYPTED: 02_WHO_画像</span>
+        <div class="data-row">
+          <b>要 ｜ 高动机基因</b>
+          <p>内心对成长和突围有绝对的饥饿感，高标准要求自己，敢对最终的交付结果死磕负责。</p>
+        </div>
+        <div class="data-row">
+          <b>开 ｜ 极致开放性</b>
+          <p>能够主动拥抱前沿产业带来的剧烈变化与不确定性，打破固有框架，不把自己锁在单一答案里。</p>
+        </div>
+        <div class="data-row">
+          <b>学 ｜ 疯狂持续自驱</b>
+          <p>具备海绵一样的硬核吸收体质。能保持高频的主动学习，快速熟练掌控全新的 AI 工具流。</p>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="celestial-star star-01">
+      <div class="star-core">
+        <div class="tag">01 // WHY_缘起</div>
+      </div>
+    </div>
+
+    <div class="celestial-star star-02">
+      <div class="star-core">
+        <div class="tag">02 // WHO_同类</div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    document.body.classList.add('is-entering');
+    setTimeout(() => document.body.classList.remove('is-entering'), 940);
+    document.querySelectorAll('a[href*=".html"]').forEach(link => {
+      link.addEventListener('click', event => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#')) return;
+        event.preventDefault();
+        document.body.classList.add('is-leaving');
+        setTimeout(() => { window.location.href = href; }, 640);
+      });
+    });
+  </script>
+</body>
+</html>
