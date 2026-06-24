@@ -481,6 +481,7 @@
       animation-play-state: paused;
     }
     .genz-barrage.is-visible .genz-lane { animation-play-state: running; }
+    .genz-barrage.is-visible:hover .genz-lane { animation-play-state: paused; }
     .genz-barrage.is-visible .genz-lane:hover { animation-play-state: paused; }
     .genz-lane.lane-a { top: 32px; --lane-duration: 62s; --lane-delay: -18s; --lane-gap: 28px; }
     .genz-lane.lane-b { top: 84px; --lane-duration: 54s; --lane-delay: -34s; --lane-gap: 18px; animation-direction: reverse; }
@@ -879,7 +880,7 @@
           </div>
           <div class="genz-barrage" id="track" aria-label="AI Native 项目真实瞬间">
             <div class="genz-lane lane-a">
-              <button class="genz-signal is-big is-active" style="--accent:var(--mint);--y:2px" data-person="cici" type="button">AI先当红娘，再当侦探。</button>
+              <button class="genz-signal is-big" style="--accent:var(--mint);--y:2px" data-person="cici" type="button">AI先当红娘，再当侦探。</button>
               <button class="genz-signal is-tiny is-whisper" style="--accent:var(--cyan);--y:-8px;--r:-1deg" data-person="qi" type="button">遇事不决，AI一下</button>
               <button class="genz-signal is-medium is-hot" style="--accent:var(--orange);--y:7px" data-person="linda" type="button">人选不面了？我忍住没哭</button>
               <button class="genz-signal is-tiny" style="--accent:var(--mint);--y:-5px" data-person="cici" type="button">表面聊规划，实际挖缺啥。</button>
@@ -1134,10 +1135,12 @@
       genzLoot.innerHTML = "<div>项目战利品</div>" + person.loot.map(item => `<span>${item}</span>`).join("");
     }
 
-    document.querySelectorAll('.genz-barrage').forEach(barrage => {
-      barrage.addEventListener('click', event => {
-        const signal = event.target.closest('.genz-signal');
-        if (!signal) return;
+    document.querySelectorAll('.genz-signal').forEach(signal => {
+      signal.addEventListener('focus', () => {
+        revealGenzPerson(signal.dataset.person, signal);
+      });
+      signal.addEventListener('click', event => {
+        event.preventDefault();
         revealGenzPerson(signal.dataset.person, signal);
       });
     });
