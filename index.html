@@ -1120,7 +1120,7 @@
       const person = genzPeople[personKey];
       if (!person || !genzPhoto || !genzRole || !genzSchool || !genzYear || !genzName || !genzQuote || !genzDesc || !genzLoot) return;
       document.querySelectorAll('.genz-signal').forEach(signal => {
-        signal.classList.toggle('is-active', signal.textContent === source.textContent && signal.dataset.person === source.dataset.person);
+        signal.classList.toggle('is-active', signal === source);
       });
       genzPhoto.src = person.photo;
       genzPhoto.alt = person.name + "项目档案";
